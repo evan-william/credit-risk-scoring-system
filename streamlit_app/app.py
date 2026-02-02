@@ -21,7 +21,7 @@ data_dir = project_root / 'data'
 # Page configuration
 st.set_page_config(
     page_title="Credit Risk Scoring System",
-    page_icon="🏦",
+    page_icon="🪙",
     layout="wide",
     initial_sidebar_state="expanded"
 )
