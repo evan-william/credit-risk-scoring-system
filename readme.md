@@ -2,46 +2,103 @@
 
 A production-ready machine learning system for predicting credit default risk using advanced feature engineering and gradient boosting algorithms.
 
+![Python](https://img.shields.io/badge/Python-3.8+-blue?style=flat&logo=python)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-ML-orange?style=flat)
+![Streamlit](https://img.shields.io/badge/Streamlit-App-red?style=flat)
+![License](https://img.shields.io/badge/License-Educational-green?style=flat)
+
+---
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Key Features](#key-features)
+- [Architecture](#architecture)
+- [Technical Implementation](#technical-implementation)
+- [Performance Metrics](#performance-metrics)
+- [Installation](#installation)
+- [Project Structure](#project-structure)
+- [Technology Stack](#technology-stack)
+- [Use Cases](#use-cases)
+- [Limitations](#limitations)
+- [Future Development](#future-development)
+
 ---
 
 ## Overview
 
 This project implements an enterprise-grade credit risk assessment system that addresses real-world challenges in consumer lending. The system processes credit applications, evaluates default probability, and provides actionable risk assessments through an interactive web interface.
 
-**Key Characteristics:**
+### Key Characteristics
+
 - Handles severely imbalanced datasets (approximately 5% default rate)
-- Implements domain-informed feature engineering
+- Implements domain-informed feature engineering with 60+ derived features
 - Focuses on business-relevant metrics over traditional accuracy
 - Provides explainable predictions for regulatory compliance
+- Production-ready with modular architecture and web interface
+
+---
+
+## Key Features
+
+**Advanced Feature Engineering**
+- Financial ratios: DTI, LTI, credit utilization, available income
+- Risk indicators: payment risk, inquiry risk, stability scores
+- Interaction and polynomial features for complex relationships
+
+**Robust Model Training**
+- Gradient Boosting Classifier optimized for imbalanced data
+- Sample weighting strategy (scale_pos_weight = 16.57)
+- Threshold optimization for business objectives
+- Cross-validation and hyperparameter tuning
+
+**Interactive Web Application**
+- Single application assessment with real-time predictions
+- Batch processing via CSV upload
+- Visual risk scoring with detailed breakdowns
+- Model performance analytics dashboard
+- Exportable predictions and reports
+
+**Business-Focused Metrics**
+- Default Detection Rate: 57%
+- Approved Loan Quality: 97%
+- ROC-AUC: 0.69
+- Balanced approach between risk mitigation and lending volume
 
 ---
 
 ## Architecture
 
-The system follows a modular pipeline architecture:
+### System Pipeline
 
-**Data Layer**
+```
+Data Generation → Feature Engineering → Model Training → Web Application
+```
+
+**1. Data Layer**
 - Synthetic data generation with realistic correlations
-- 20,000 credit applications with 20+ base features
-- Controlled imbalance ratio matching industry standards
+- 20,000 credit applications (15K train, 5K test)
+- 20+ base features spanning demographics, financials, and credit history
+- Controlled 5-8% default rate matching industry standards
 
-**Feature Engineering**
-- 60+ derived features including financial ratios and risk indicators
-- Domain-specific transformations (DTI, LTI, credit utilization)
+**2. Feature Engineering**
+- 60+ derived features using domain knowledge
+- Financial ratios and risk indicators
+- Categorical encodings and binning
 - Polynomial and interaction terms
 - Standardized preprocessing pipeline
 
-**Model Layer**
-- Gradient Boosting Classifier optimized for imbalanced data
-- Sample weighting to address class imbalance
-- Threshold optimization for business objectives
-- Cross-validation and hyperparameter tuning
+**3. Model Layer**
+- Gradient Boosting Classifier with 300 estimators
+- Optimized for imbalanced classification
+- Sample weighting and threshold tuning
+- Comprehensive evaluation framework
 
-**Application Layer**
-- Streamlit-based web interface
-- Single and batch prediction modes
-- Real-time risk assessment
-- Model performance analytics
+**4. Application Layer**
+- Streamlit-based interactive interface
+- Real-time and batch prediction modes
+- Visual analytics and reporting
+- Model performance monitoring
 
 ---
 
@@ -49,10 +106,10 @@ The system follows a modular pipeline architecture:
 
 ### Data Generation
 
-The system generates realistic synthetic credit data with intentional correlations mirroring real-world patterns:
+Synthetic credit data with intentional correlations mirroring real-world patterns:
 
 ```python
-# Risk calculation based on multiple factors
+# Risk score calculation
 risk_score = (
     (850 - credit_score) / 100 +
     dti_ratio * 3 +
@@ -62,37 +119,38 @@ risk_score = (
 ```
 
 **Dataset Characteristics:**
-- 15,000 training samples
-- 5,000 test samples
+- 20,000 total samples (15K train / 5K test)
 - 5-8% default rate (minority class)
-- Features span demographics, financials, and credit history
+- Realistic correlations between features
+- No data leakage between train and test sets
 
 ### Feature Engineering
 
-Comprehensive feature creation based on domain knowledge:
-
 **Financial Ratios**
-- Debt-to-Income (DTI): `(existing_debt + monthly_payment) / monthly_income`
-- Loan-to-Income (LTI): `loan_amount / (monthly_income * 12)`
-- Credit Utilization: `debt / estimated_credit_limit`
-- Available Income: `income - debts - payment`
+```python
+DTI = (existing_debt + monthly_payment) / monthly_income
+LTI = loan_amount / (monthly_income * 12)
+Credit_Utilization = debt / estimated_credit_limit
+Available_Income = income - debts - payment
+```
 
 **Risk Indicators**
-- Payment risk score (combination of late payments and delinquencies)
-- Inquiry risk score (recent credit inquiries)
-- Stability score (employment length + credit history)
-- Loan burden assessment
+- Payment Risk Score: Combination of late payments and delinquencies
+- Inquiry Risk Score: Recent credit inquiries weighted by recency
+- Stability Score: Employment length + credit history age
+- Loan Burden: Categorical assessment of debt load
 
 **Categorical Features**
-- Credit score tiers (Poor/Fair/Good/Excellent)
-- Age groups
-- Debt burden categories
+- Credit Score Tiers: Poor / Fair / Good / Excellent
+- Age Groups: Young / Middle / Senior
+- Debt Burden: Low / Medium / High / Very High
 
 **Advanced Features**
-- Interaction terms (credit_score × DTI, income × stability)
-- Polynomial features (DTI², credit_score²)
+- Interaction terms: credit_score × DTI, income × stability
+- Polynomial features: DTI², credit_score²
+- All features standardized using StandardScaler
 
-### Model Training
+### Model Configuration
 
 **Algorithm:** Gradient Boosting Classifier
 
@@ -108,69 +166,68 @@ Comprehensive feature creation based on domain knowledge:
 }
 ```
 
-**Imbalanced Data Strategy:**
-- Sample weighting with scale_pos_weight = 16.57
-- Threshold tuning optimized for F1 score
-- Focus on recall for minority class (defaults)
-
-**Performance Metrics:**
-- ROC-AUC: 0.69
-- Overall Accuracy: 70%
-- Default Detection Rate: 57%
-- Approved Loan Quality: 97%
-
-### Web Application
-
-Built with Streamlit for accessibility and ease of deployment:
-
-**Features:**
-- Interactive form for single application assessment
-- CSV upload for batch processing
-- Visual risk scoring with gauge charts
-- Detailed risk factor breakdown
-- Model performance dashboard
-- Exportable predictions
+**Imbalanced Data Handling:**
+- Sample weighting: scale_pos_weight = 16.57
+- Threshold optimization: Tuned for F1 score maximization
+- Focus on recall for minority class detection
 
 ---
 
-## Performance Analysis
+## Performance Metrics
 
-### Confusion Matrix
+### Confusion Matrix Results
 
-|                | Predicted: No Default | Predicted: Default |
-|----------------|----------------------|-------------------|
-| Actual: No Default | 3,330 (TN) | 1,408 (FP) |
-| Actual: Default | 113 (FN) | 149 (TP) |
+|                    | Predicted: No Default | Predicted: Default |
+|--------------------|----------------------|-------------------|
+| **Actual: No Default** | 3,330 (TN)           | 1,408 (FP)        |
+| **Actual: Default**    | 113 (FN)             | 149 (TP)          |
 
-### Business Metrics
+### Key Business Metrics
 
-**Default Detection Rate: 56.87%**  
-The model successfully identifies over half of potential defaults before they occur, enabling proactive risk management.
+| Metric | Value | Interpretation |
+|--------|-------|----------------|
+| **ROC-AUC** | 0.69 | Good discrimination ability |
+| **Overall Accuracy** | 70% | Balanced performance |
+| **Default Detection Rate** | 57% | Identifies over half of defaults |
+| **Approved Loan Quality** | 97% | High portfolio quality |
+| **Rejection Rate** | 31% | Conservative but balanced |
 
-**Approved Loan Quality: 96.72%**  
-Among approved applications, 97 out of 100 are expected to perform as agreed, maintaining a healthy loan portfolio.
+### Business Impact
 
-**Rejection Rate: 31.14%**  
-A balanced approach that manages risk while maximizing lending volume.
+**Default Detection Rate (56.87%)**  
+Successfully identifies over half of potential defaults before they occur, enabling proactive risk management and loss prevention.
 
-**Key Insight:** The model is intentionally conservative (higher false positive rate) to minimize financial losses from false negatives. This trade-off aligns with typical risk management priorities in lending.
+**Approved Loan Quality (96.72%)**  
+Among approved applications, 97 out of 100 are expected to perform as agreed, maintaining a healthy and profitable loan portfolio.
+
+**Strategic Trade-off**  
+The model is intentionally conservative with a higher false positive rate to minimize costly false negatives. This aligns with standard risk management priorities in consumer lending.
 
 ---
 
-## Installation and Usage
+## Installation
+
+### Prerequisites
+
+- Python 3.8 or higher
+- pip package manager
 
 ### Quick Start
 
 ```bash
+# Clone the repository
+git clone https://github.com/[USERNAME]/credit-risk-system.git
+cd credit-risk-system
+
 # Install dependencies
 pip install -r requirements.txt
 
-# Launch the web application
+# Launch web application
 cd streamlit_app
 streamlit run app.py
 ```
 
-The pre-trained model is included in the repository and ready to use.
+The pre-trained model is included and ready to use immediately.
 
 ### Retraining the Model
 
@@ -179,7 +236,7 @@ cd src
 python train_pipeline.py
 ```
 
-This will regenerate data, engineer features, train the model, and update all saved artifacts.
+This regenerates data, engineers features, trains the model, and updates all artifacts.
 
 ---
 
@@ -194,7 +251,7 @@ credit_risk_system/
 │   └── *_processed.csv               # Engineered features
 │
 ├── models/
-│   ├── credit_risk_model.pkl         # Serialized model
+│   ├── credit_risk_model.pkl         # Trained model
 │   ├── feature_engine.pkl            # Feature pipeline
 │   └── model_report.txt              # Performance metrics
 │
@@ -202,7 +259,7 @@ credit_risk_system/
 │   ├── data_generator.py             # Synthetic data creation
 │   ├── feature_engineering.py        # Feature engineering logic
 │   ├── model_training.py             # Training and evaluation
-│   └── train_pipeline.py             # End-to-end orchestration
+│   └── train_pipeline.py             # End-to-end pipeline
 │
 ├── streamlit_app/
 │   └── app.py                        # Web application
@@ -210,124 +267,149 @@ credit_risk_system/
 ├── docs/
 │   └── USER_GUIDE.md                 # Detailed documentation
 │
-├── README.md
-├── QUICKSTART.md
-└── requirements.txt
+├── requirements.txt                  # Python dependencies
+├── README.md                         # Project documentation
+└── LICENSE                           # License information
 ```
 
 ---
 
 ## Technology Stack
 
-**Core Technologies:**
-- Python 3.8+
-- Scikit-learn (machine learning)
-- Pandas, NumPy (data processing)
-- Streamlit (web framework)
+### Core Libraries
 
-**Visualization:**
-- Matplotlib, Seaborn (static plots)
-- Plotly (interactive charts)
+- **Python 3.8+**: Primary programming language
+- **scikit-learn**: Machine learning framework
+- **Pandas**: Data manipulation and analysis
+- **NumPy**: Numerical computing
+- **Streamlit**: Web application framework
 
-**Utilities:**
-- Joblib (model serialization)
-- StandardScaler, LabelEncoder (preprocessing)
+### Visualization
+
+- **Matplotlib**: Static plotting
+- **Seaborn**: Statistical visualizations
+- **Plotly**: Interactive charts
+
+### Utilities
+
+- **Joblib**: Model serialization
+- **StandardScaler**: Feature normalization
+- **LabelEncoder**: Categorical encoding
 
 ---
 
 ## Use Cases
 
 ### Financial Institutions
+
 - Automated credit underwriting to reduce manual review time
 - Quantitative risk assessment for loan approval decisions
 - Portfolio-level risk analysis and stress testing
 - Compliance documentation with explainable predictions
 
 ### Fintech Applications
+
 - Real-time credit decision APIs
 - High-volume application processing
 - A/B testing different risk models
-- Integration with existing loan origination systems
+- Integration with loan origination systems
 
 ### Educational & Research
-- Demonstration of end-to-end ML pipeline
-- Study of imbalanced classification techniques
+
+- End-to-end ML pipeline demonstration
+- Imbalanced classification techniques
 - Feature engineering in financial domain
-- Production deployment practices
+- Production deployment best practices
 
 ---
 
-## Limitations and Considerations
+## Limitations
 
-**Data Limitations:**
-- Trained on synthetic data; real-world performance will vary
-- Does not account for macroeconomic factors
-- Limited to snapshot data (no time-series analysis)
+### Data Constraints
 
-**Model Constraints:**
+- Trained on synthetic data; real-world performance may vary
+- Does not account for macroeconomic factors or market conditions
+- Limited to snapshot data without time-series analysis
+- May not capture all real-world feature relationships
+
+### Model Constraints
+
 - Assumes feature distributions remain stable over time
 - May exhibit bias if training data is not representative
-- Threshold is optimized for current dataset balance
+- Threshold optimized for current dataset balance
+- Performance degrades with significant distribution shift
 
-**Deployment Notes:**
-- Requires model monitoring for drift detection
-- Should be validated against historical data before production use
-- Regulatory compliance review recommended for actual deployment
+### Deployment Considerations
+
+- Requires continuous monitoring for model drift
+- Should be validated against historical data before production
+- Regulatory compliance review recommended
+- Periodic retraining necessary to maintain performance
 
 ---
 
 ## Future Development
 
-**Technical Roadmap:**
-- REST API implementation (Flask/FastAPI)
-- Model monitoring and retraining pipeline
-- Docker containerization
-- Database integration (PostgreSQL)
-- Automated testing suite
+### Technical Enhancements
 
-**Feature Enhancements:**
-- Additional ML algorithms (XGBoost, LightGBM, Neural Networks)
+- REST API implementation using Flask or FastAPI
+- Automated model monitoring and retraining pipeline
+- Docker containerization for easy deployment
+- Database integration (PostgreSQL, MongoDB)
+- Comprehensive automated testing suite
+- CI/CD pipeline setup
+
+### Model Improvements
+
+- Alternative algorithms: XGBoost, LightGBM, Neural Networks
 - Ensemble methods for improved accuracy
-- SHAP/LIME for enhanced interpretability
+- SHAP and LIME for enhanced interpretability
 - Fairness and bias auditing tools
 - Time-series features for longitudinal analysis
+- Calibrated probability estimates
 
-**Application Features:**
-- User authentication and role-based access
-- Audit logging for compliance
-- PDF report generation
+### Application Features
+
+- User authentication and role-based access control
+- Comprehensive audit logging for compliance
+- PDF report generation for decisions
 - Email notification system
 - Historical trend analysis dashboard
+- Batch processing queue system
 
 ---
 
 ## Technical Highlights
 
-This project demonstrates several important machine learning engineering practices:
+### Handling Class Imbalance
 
-**Handling Class Imbalance**  
-Rather than simply using SMOTE or other resampling techniques, the project implements a combination of sample weighting and threshold optimization. This approach preserves the true data distribution while achieving better minority class recall.
+Rather than simple resampling techniques like SMOTE, this project implements a combination of sample weighting and threshold optimization. This preserves the true data distribution while achieving better minority class recall.
 
-**Business-Focused Metrics**  
-The evaluation framework prioritizes business-relevant metrics (default detection rate, approved loan quality) over traditional accuracy. This reflects real-world decision-making where different error types have different costs.
+### Business-Focused Evaluation
 
-**Feature Engineering Pipeline**  
-The feature engineering is implemented as a reusable pipeline that can be applied consistently to training data, test data, and new predictions. This ensures no data leakage and simplifies deployment.
+The evaluation framework prioritizes business-relevant metrics (default detection rate, approved loan quality) over traditional accuracy. This reflects real-world decision-making where different error types have different financial costs.
 
-**Explainability**  
-Beyond feature importance, the application provides per-prediction risk breakdowns, making the model's decisions interpretable for end users and compliance officers.
+### Production-Ready Pipeline
+
+The feature engineering is implemented as a reusable, serializable pipeline that ensures consistent processing across training, testing, and prediction. This design prevents data leakage and simplifies deployment.
+
+### Explainable Predictions
+
+Beyond global feature importance, the application provides per-prediction risk factor breakdowns, making model decisions interpretable for end users, loan officers, and compliance teams.
 
 ---
 
 ## Contributing
 
-This is a portfolio project and is not actively maintained for external contributions. However, feel free to fork the repository for your own use or learning purposes.
+This is a portfolio project and is not actively maintained for external contributions. However, you are welcome to fork the repository for your own learning or use.
+
+If you find this project helpful, attribution is appreciated but not required.
 
 ---
 
 ## License
 
-This project is available for educational and portfolio purposes. If you use this code as a reference or starting point, attribution is appreciated but not required.
+This project is available for educational and portfolio purposes under the MIT License.
 
 ---
 
@@ -335,9 +417,14 @@ This project is available for educational and portfolio purposes. If you use thi
 
 **Evan William**
 
-This project was developed as a demonstration of production-ready machine learning engineering, from data generation through deployment.
+Developed as a demonstration of production-ready machine learning engineering, covering the full lifecycle from data generation to deployment.
+
+**Contact:**
+- GitHub: [Your GitHub Profile]
+- LinkedIn: [Your LinkedIn Profile]
+- Email: [Your Email]
 
 ---
 
-**Last Updated:** February 2024  
-**Version:** 1.0.0
+**Version:** 1.0.0  
+**Last Updated:** February 2024
